@@ -127,14 +127,19 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * Add the given singleton object to the singleton cache of this factory.
 	 * <p>To be called for eager registration of singletons.
-	 * @param beanName the name of the bean
-	 * @param singletonObject the singleton object
+	 * 把对象加入到单例缓存池（所谓的一级缓存，并且考虑循环依赖和正常情况下，移除二三级缓存）
+	 * @param beanName the name of the bean			bean的名称
+	 * @param singletonObject the singleton object	创建出来的单实例bean
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			// 加入到单例缓存池中
 			this.singletonObjects.put(beanName, singletonObject);
+			// 从三级缓存中移除（针对的不是处理循环依赖的）
 			this.singletonFactories.remove(beanName);
+			// 从二级缓存中移除（循环依赖的时候，早期对象存在于二级缓存）
 			this.earlySingletonObjects.remove(beanName);
+			// 用来记录保存已经处理的bean
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -174,7 +179,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		/**
+		 * 第一步：我们尝试去一级缓存（单例缓存池中去获取对象，一般情况从该map中获取的对象是直接可以使用的）
+		 * IOC容器初始化加载单实例bean的时候第一次进来的时候，该map中一般返回空
+		 * singletonObjects单例缓存池
+		 */
 		Object singletonObject = this.singletonObjects.get(beanName);
+		/**
+		 * 若在第一级缓存中没有获取到对象，并且singletonsCurrentlyInCreation这个list包含该beanName
+		 * IOC容器初始化加载单实例bean的时候第一次进来的时候，该list中一般返回空，但是循环依赖的时候可以满足该条件
+		 */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
