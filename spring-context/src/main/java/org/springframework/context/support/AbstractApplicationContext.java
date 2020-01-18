@@ -534,6 +534,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Invoke factory processors registered as beans in the context.
 				// 调用bean工厂的后置处理器
+				// 加载bean定义
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -558,6 +559,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Instantiate all remaining (non-lazy-init) singletons.
 				// 实例化剩余的单实例bean
+				// 创建bean
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -861,6 +863,50 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
+		// 为bean工厂创建类型转化器	Convert
+		/**
+		 * public class String2DateConversionService implements Converter<String, Date> {
+		 *    @Override
+		 *    public Date convert(String source) {
+		 * 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		 * 		try {
+		 * 			return dateFormat.parse(source);
+		 *        } catch (ParseException e) {
+		 * 			return null;
+		 *        }
+		 *    }
+		 *
+		 *    @Override
+		 *    public int hashCode() {
+		 * 		return super.hashCode();
+		 *    }
+		 *
+		 *    @Override
+		 *    public boolean equals(Object obj) {
+		 * 		return super.equals(obj);
+		 *    }
+		 * }
+		 *
+		 * @Bean
+		 * public ConversionServiceFactoryBean conversionService() {
+		 * 		ConversionServiceFactoryBean factoryBean = new ConversionServiceFactoryBean();
+		 * 		Set<Converter<String, Date>> converterSet = new HashSet<>();
+		 * 		converterSet.add(new String2DateConversionService());
+		 * 		factoryBean.setConverters(converterSet);
+		 * 		return factoryBean;
+		 * }
+		 *
+		 * public class MainStarter {
+		 * 	public static void main(String[] args) {
+		 * 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class);
+		 *
+		 * 		ConversionServiceFactoryBean conversionServiceFactoryBean = context.getBean(ConversionServiceFactoryBean.class);
+		 *
+		 * 		Date date = Objects.requireNonNull(conversionServiceFactoryBean.getObject()).convert("2019-01-18 10:00:00", Date.class);
+		 * 		System.out.println(date);
+		 *        }
+		 * }
+		 */
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -875,6 +921,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// 处理关于aspectj
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
@@ -884,9 +931,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.setTempClassLoader(null);
 
 		// Allow for caching all bean definition metadata, not expecting further changes.
+		// 冻结所有的bean定义，说明注册的bean定义将不被修改或任何进一步的处理
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// 实例化剩余的单实例bean
 		beanFactory.preInstantiateSingletons();
 	}
 

@@ -1,7 +1,10 @@
 package com.liuzhen.iocbeanlifecicle;
 
+import java.util.Date;
+import java.util.Objects;
+
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.ConversionServiceFactoryBean;
 
 /**
  * @ClassName MainStarter
@@ -18,5 +21,10 @@ public class MainStarter {
 
 		Person person = (Person)context.getBean("person");
 		System.out.println("person: " + person);
+
+		//ConversionServiceFactoryBean conversionServiceFactoryBean = context.getBean(ConversionServiceFactoryBean.class);
+		//
+		//Date date = Objects.requireNonNull(conversionServiceFactoryBean.getObject()).convert("2019-01-18 10:00:00", Date.class);
+		//System.out.println(date);
 	}
 }

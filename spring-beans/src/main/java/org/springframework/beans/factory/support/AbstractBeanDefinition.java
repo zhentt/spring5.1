@@ -100,18 +100,21 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Constant that indicates no dependency check at all.
+	 * 不需要检查依赖
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_NONE = 0;
 
 	/**
 	 * Constant that indicates dependency checking for object references.
+	 * 检查对象引用的依赖
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_OBJECTS = 1;
 
 	/**
 	 * Constant that indicates dependency checking for "simple" properties.
+	 * 简单属性的依赖
 	 * @see #setDependencyCheck
 	 * @see org.springframework.beans.BeanUtils#isSimpleProperty
 	 */
@@ -120,6 +123,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Constant that indicates dependency checking for all properties
 	 * (object references as well as "simple" properties).
+	 * 对象属性和简单属性都检查依赖
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_ALL = 3;
@@ -136,26 +140,54 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public static final String INFER_METHOD = "(inferred)";
 
-
+	/**
+	 * 用于保存bean组件的class对象
+	 */
 	@Nullable
 	private volatile Object beanClass;
 
+	/**
+	 * bean的作用范围
+	 * 默认是singleton,prototype
+	 */
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
 
+	/**
+	 * 判断当前的bean是不是抽象的
+	 */
 	private boolean abstractFlag = false;
 
+	/**
+	 * 判断当前的bean是不是懒加载的
+	 */
 	private boolean lazyInit = false;
 
+	/**
+	 * 默认的注入模型是0 不支持外部注入
+	 */
 	private int autowireMode = AUTOWIRE_NO;
 
+	/**
+	 * 默认的依赖检查模式
+	 */
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
+	/**
+	 * 当前的bean创建 必须要依赖哪个bean先被创建
+	 */
 	@Nullable
 	private String[] dependsOn;
 
+	/**
+	 * 设置为false的时候，这样容器在自动装配对象的时候，
+	 * 会不考虑当前的bean(它不会被看做 为其他bean的依赖的bean，但是它依赖其他的bean是能够被自动装配进来的)
+	 */
 	private boolean autowireCandidate = true;
 
+	/**
+	 * 当发生自动装配的时候，假如某个bean会发现多个，那么标注了primary 为true的首先被注入
+	 */
 	private boolean primary = false;
 
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
