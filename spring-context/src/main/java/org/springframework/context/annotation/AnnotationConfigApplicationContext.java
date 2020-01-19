@@ -69,13 +69,22 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+
 		/**
-		 * 初始化注解模式下的bean定义扫描器
+		 * 其实这里隐藏了一行代码，即会隐式调用父类的无参构造器。
+		 * 下面的这行代码是我手动添加的，非Spring源码自带
+		 * 这里会初始化beanFactory，具体的实现类为 DefaultListableBeanFactory。
+		 */
+		super();
+
+		/**
+		 * 初始化注解模式下的bean定义扫描器 AnnotatedBeanDefinitionReader
 		 * 调用AnnotatedBeanDefinitionReader构造方法，传入的是this（AnnotationConfigApplicationContext）对象
 		 */
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		/**
-		 * 初始化我们的classPath类型的bean定义扫描器
+		 * 初始化classPath类型的bean定义扫描器 ClassPathBeanDefinitionScanner
+		 * 调用ClassPathBeanDefinitionScanner构造方法，传入的是this（AnnotationConfigApplicationContext）对象
 		 */
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
@@ -98,10 +107,18 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
 		// 调用构造函数
+		// 初始化注解模式下的bean定义扫描器 AnnotatedBeanDefinitionReader
+		// 调用AnnotatedBeanDefinitionReader构造方法，传入的是this（AnnotationConfigApplicationContext）对象；
+		// 初始化classPath类型的bean定义扫描器 ClassPathBeanDefinitionScanner
+		// 调用ClassPathBeanDefinitionScanner构造方法，传入的是this（AnnotationConfigApplicationContext）对象;
 		this();
 		// 注册我们的配置类
+		// 把传入的Class进行注册，Class既可以有@Configuration注解，也可以没有@Configuration注解，即是一个普通的Java类
+		// 怎么注册？
+		// 委托给了 org.springframework.context.annotation.AnnotatedBeanDefinitionReader.register 方法进行注册
+		// 传入Class 生成  BeanDefinition ,然后通过注册到 BeanDefinitionRegistry
 		register(componentClasses);
-		// IOC容器刷新接口
+		// IOC容器刷新上下文
 		refresh();
 	}
 

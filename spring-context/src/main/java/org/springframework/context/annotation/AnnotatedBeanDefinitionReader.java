@@ -68,6 +68,9 @@ public class AnnotatedBeanDefinitionReader {
 	 * @see #setEnvironment(Environment)
 	 */
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
+		// getOrCreateEnvironment(registry)
+		// 根据传入的BeanDefinitionRegistry，即AnnotationConfigApplicationContext对象中获取到环境Environment（共用同一个Environment）
+		// 如果获取不到的话，返回的环境是StandardEnvironment
 		this(registry, getOrCreateEnvironment(registry));
 	}
 
@@ -85,6 +88,8 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+		// 在BeanDefinitionRegistry 中注册 注解配置相关的processors
+		// spring通过这个方法注册了 解析注解配置相关的处理器
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
