@@ -163,6 +163,8 @@ public abstract class BeanDefinitionReaderUtils {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
+		// 将BeanDefinition注册到DefaultListableBeanFactory中，也就是spring容器中。
+		// 所谓的注册BeanDefinition，简单理解就是将BeanDefinition放到DefaultListableBeanFactory对象的beanDefinitionMap中。
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
 		// Register aliases for bean name, if any.

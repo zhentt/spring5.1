@@ -190,6 +190,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	@Override
 	public void register(Class<?>... componentClasses) {
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
+		// private final AnnotatedBeanDefinitionReader reader;
+		// 运行完register(componentClasses)方法之后，spring容器中还没有实例化bean，而只是注册了一些BeanDefinition。
 		this.reader.register(componentClasses);
 	}
 
